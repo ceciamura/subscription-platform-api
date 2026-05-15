@@ -1,4 +1,4 @@
-package com.subscription.demo.controller;
+package com.subscription.demo.web;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
