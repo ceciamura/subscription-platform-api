@@ -1,5 +1,8 @@
 package com.subscription.demo.domain;
 
+import jakarta.persistence.*;
+
+
 public class Subscription {
 
     private String id;
