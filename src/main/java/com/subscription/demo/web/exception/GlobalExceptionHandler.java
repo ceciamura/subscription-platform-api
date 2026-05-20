@@ -1,5 +1,6 @@
 package com.subscription.demo.web.exception;
 
+import com.subscription.demo.web.response.ErrorResponse;
 import com.subscription.demo.web.response.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,9 +24,16 @@ public class GlobalExceptionHandler {
                 error -> errors.put(error.getField(), error.getDefaultMessage())
         );
 
-
         return new ValidationErrorResponse(HttpStatus.BAD_REQUEST.value(),
                                         "Validation Failed",
                                                  errors);
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(SubscriptionNotFoundException.class)
+    public ErrorResponse handleSubscriptionNotFound(SubscriptionNotFoundException exception){
+
+        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
+
     }
 }

@@ -4,10 +4,7 @@ import com.subscription.demo.application.SubscriptionService;
 import com.subscription.demo.domain.Subscription;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,5 +29,10 @@ public class SubscriptionController {
     @GetMapping("/subscriptions")
     public List<Subscription> getSubscriptions(){
         return subscriptionService.getSubscriptions();
+    }
+
+    @GetMapping("subscriptions/{id}")
+    public Subscription getSubscriptionById(@PathVariable(name = "id") String id){
+        return subscriptionService.getSubscriptionById(id);
     }
 }

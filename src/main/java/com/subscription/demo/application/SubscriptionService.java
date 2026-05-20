@@ -3,6 +3,7 @@ package com.subscription.demo.application;
 import com.subscription.demo.domain.Subscription;
 import com.subscription.demo.infrastucture.persistence.SubscriptionRepository;
 import com.subscription.demo.infrastucture.persistence.SubscriptionEntity;
+import com.subscription.demo.web.exception.SubscriptionNotFoundException;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,12 +42,19 @@ public class SubscriptionService {
 
     public List<Subscription> getSubscriptions() {
         List<SubscriptionEntity> subscriptionEntityList = subscriptionRepository.findAll();
-        List<Subscription> subscriptionList = subscriptionEntityList.stream()
-                .map(entity -> new Subscription(
-                        entity.getId(),
-                        entity.getCustomerEmail(),
-                        entity.getMonthlyPrice()))
-                .toList();
-      return subscriptionList;
+
+      return  subscriptionEntityList.stream()
+              .map(entity -> new Subscription(
+                      entity.getId(),
+                      entity.getCustomerEmail(),
+                      entity.getMonthlyPrice()))
+              .toList();
+    }
+
+    public Subscription getSubscriptionById(String id){
+        SubscriptionEntity entity = subscriptionRepository
+                .findById(id)
+                .orElseThrow(() -> new SubscriptionNotFoundException(id));
+        return new Subscription(entity.getId(), entity.getCustomerEmail(), entity.getMonthlyPrice());
     }
 }
