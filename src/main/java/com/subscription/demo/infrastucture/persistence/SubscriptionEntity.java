@@ -21,7 +21,6 @@ public class SubscriptionEntity {
         this.customerEmail = customerEmail;
         this.monthlyPrice = monthlyPrice;
     }
-
     public String getId() {
         return id;
     }
@@ -32,5 +31,13 @@ public class SubscriptionEntity {
 
     public Double getMonthlyPrice() {
         return monthlyPrice;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public void setMonthlyPrice(Double monthlyPrice) {
+        this.monthlyPrice = monthlyPrice;
     }
 }

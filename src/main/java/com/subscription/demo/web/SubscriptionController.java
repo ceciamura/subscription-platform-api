@@ -2,8 +2,12 @@ package com.subscription.demo.web;
 
 import com.subscription.demo.application.SubscriptionService;
 import com.subscription.demo.domain.Subscription;
+import com.subscription.demo.web.mapper.ResponseMapper;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
+import com.subscription.demo.web.request.UpdateSubscriptionRequest;
+import com.subscription.demo.web.response.SubscriptionResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,19 +24,38 @@ public class SubscriptionController {
 
 
     @PostMapping("/subscriptions")
-    public Subscription newSubscription(@Valid @RequestBody CreateSubscriptionRequest subscription){
+    public SubscriptionResponse newSubscription(@Valid @RequestBody CreateSubscriptionRequest subscription){
+        Subscription newSubscription = subscriptionService.newSubscription(subscription);
 
-        return subscriptionService.newSubscription(subscription);
+        return ResponseMapper.toResponse(newSubscription);
 
     }
 
     @GetMapping("/subscriptions")
-    public List<Subscription> getSubscriptions(){
-        return subscriptionService.getSubscriptions();
+    public List<SubscriptionResponse> getSubscriptions(){
+        List<Subscription> subscriptionList = subscriptionService.getSubscriptions();
+        return subscriptionList.stream()
+                .map(ResponseMapper::toResponse).toList();
     }
 
-    @GetMapping("subscriptions/{id}")
-    public Subscription getSubscriptionById(@PathVariable(name = "id") String id){
-        return subscriptionService.getSubscriptionById(id);
+    @GetMapping("/subscriptions/{id}")
+    public SubscriptionResponse getSubscriptionById(@PathVariable(name = "id") String id){
+
+        Subscription subscription = subscriptionService.getSubscriptionById(id);
+
+        return ResponseMapper.toResponse(subscription);
+    }
+
+    @DeleteMapping("/subscriptions/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteSubscriptionById(@PathVariable(name = "id") String id){
+         subscriptionService.deleteSubscriptionById(id);
+    }
+
+    @PutMapping("/subscription/{id}")
+    public SubscriptionResponse updateSubscription(@Valid @RequestBody UpdateSubscriptionRequest request, @PathVariable(name = "id") String id){
+        Subscription subscription = subscriptionService.updateSubscription(request, id);
+
+        return ResponseMapper.toResponse(subscription);
     }
 }
