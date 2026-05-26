@@ -6,6 +6,8 @@ import com.subscription.demo.web.mapper.ResponseMapper;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import com.subscription.demo.web.request.UpdateSubscriptionRequest;
 import com.subscription.demo.web.response.SubscriptionResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -18,19 +20,21 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
 
-    public SubscriptionController(SubscriptionService subscriptonService) {
-        this.subscriptionService = subscriptonService;
+    public SubscriptionController(SubscriptionService subscriptionService) {
+        this.subscriptionService = subscriptionService;
     }
 
-
+    @Operation(summary = "Create a new subscription")
     @PostMapping("/subscriptions")
-    public SubscriptionResponse newSubscription(@Valid @RequestBody CreateSubscriptionRequest subscription){
+    public SubscriptionResponse newSubscription(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                     description = "New Subscription")
+                                                @Valid @RequestBody CreateSubscriptionRequest subscription){
         Subscription newSubscription = subscriptionService.newSubscription(subscription);
 
         return ResponseMapper.toResponse(newSubscription);
 
     }
-
+    @Operation(summary = "Get all subscriptions")
     @GetMapping("/subscriptions")
     public List<SubscriptionResponse> getSubscriptions(){
         List<Subscription> subscriptionList = subscriptionService.getSubscriptions();
@@ -38,22 +42,27 @@ public class SubscriptionController {
                 .map(ResponseMapper::toResponse).toList();
     }
 
-
+    @Operation(summary = "Get a subscription by ID")
     @GetMapping("/subscriptions/{id}")
-    public SubscriptionResponse getSubscriptionById(@PathVariable(name = "id") String id){
+    public SubscriptionResponse getSubscriptionById(@Parameter(description = "Subscription ID")
+                                                    @PathVariable(name = "id") String id){
 
         Subscription subscription = subscriptionService.getSubscriptionById(id);
         return ResponseMapper.toResponse(subscription);
     }
-
+    @Operation(summary = "Delete a subscription by ID")
     @DeleteMapping("/subscriptions/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteSubscriptionById(@PathVariable(name = "id") String id){
+    public void deleteSubscriptionById(@Parameter(description = "Subscription ID")
+                                       @PathVariable(name = "id") String id){
          subscriptionService.deleteSubscriptionById(id);
     }
-
+    @Operation(summary = "Update a subscription by ID")
     @PutMapping("/subscriptions/{id}")
-    public SubscriptionResponse updateSubscription(@Valid @RequestBody UpdateSubscriptionRequest request,
+    public SubscriptionResponse updateSubscription(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                                        description = "Subscription details to modify")
+                                                   @Valid @RequestBody UpdateSubscriptionRequest request,
+                                                   @Parameter(description = "Subscription ID")
                                                    @PathVariable(name = "id") String id){
         Subscription subscription = subscriptionService.updateSubscription(request, id);
 
