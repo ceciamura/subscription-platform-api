@@ -56,6 +56,8 @@ public class SubscriptionService {
         SubscriptionEntity entity = subscriptionRepository
                 .findById(id)
                 .orElseThrow(() -> new SubscriptionNotFoundException(id));
+
+
         return new Subscription(entity.getId(), entity.getCustomerEmail(), entity.getMonthlyPrice());
     }
 

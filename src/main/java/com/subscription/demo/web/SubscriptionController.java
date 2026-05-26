@@ -38,11 +38,11 @@ public class SubscriptionController {
                 .map(ResponseMapper::toResponse).toList();
     }
 
+
     @GetMapping("/subscriptions/{id}")
     public SubscriptionResponse getSubscriptionById(@PathVariable(name = "id") String id){
 
         Subscription subscription = subscriptionService.getSubscriptionById(id);
-
         return ResponseMapper.toResponse(subscription);
     }
 
@@ -52,8 +52,9 @@ public class SubscriptionController {
          subscriptionService.deleteSubscriptionById(id);
     }
 
-    @PutMapping("/subscription/{id}")
-    public SubscriptionResponse updateSubscription(@Valid @RequestBody UpdateSubscriptionRequest request, @PathVariable(name = "id") String id){
+    @PutMapping("/subscriptions/{id}")
+    public SubscriptionResponse updateSubscription(@Valid @RequestBody UpdateSubscriptionRequest request,
+                                                   @PathVariable(name = "id") String id){
         Subscription subscription = subscriptionService.updateSubscription(request, id);
 
         return ResponseMapper.toResponse(subscription);
