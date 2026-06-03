@@ -1,8 +1,7 @@
 package com.subscription.demo.infrastucture.persistence;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.*;
 
 @Table(name = "subscriptions")
 @Entity
@@ -11,16 +10,20 @@ public class SubscriptionEntity {
     @Id
     private String id;
     private String customerEmail;
-    private Double monthlyPrice;
+
+    @ManyToOne
+    @JoinColumn(name = "plan_id")
+    private PlanEntity plan;
 
     public SubscriptionEntity() {
     }
 
-    public SubscriptionEntity(String id, String customerEmail, Double monthlyPrice) {
+    public SubscriptionEntity(String id, String customerEmail, PlanEntity plan) {
         this.id = id;
         this.customerEmail = customerEmail;
-        this.monthlyPrice = monthlyPrice;
+        this.plan = plan;
     }
+
     public String getId() {
         return id;
     }
@@ -29,15 +32,17 @@ public class SubscriptionEntity {
         return customerEmail;
     }
 
-    public Double getMonthlyPrice() {
-        return monthlyPrice;
-    }
 
     public void setCustomerEmail(String customerEmail) {
         this.customerEmail = customerEmail;
     }
 
-    public void setMonthlyPrice(Double monthlyPrice) {
-        this.monthlyPrice = monthlyPrice;
+
+    public PlanEntity getPlan() {
+        return plan;
+    }
+
+    public void setPlan(PlanEntity plan) {
+        this.plan = plan;
     }
 }

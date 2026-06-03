@@ -1,8 +1,12 @@
 package com.subscription.demo.application;
 
+import com.subscription.demo.domain.Plan;
 import com.subscription.demo.domain.Subscription;
+import com.subscription.demo.infrastucture.persistence.PlanEntity;
+import com.subscription.demo.infrastucture.persistence.PlanRepository;
 import com.subscription.demo.infrastucture.persistence.SubscriptionEntity;
 import com.subscription.demo.infrastucture.persistence.SubscriptionRepository;
+import com.subscription.demo.web.exception.PlanNotFoundException;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import com.subscription.demo.web.request.UpdateSubscriptionRequest;
 import org.junit.jupiter.api.Test;
@@ -21,8 +25,11 @@ class SubscriptionServiceTest {
     private final SubscriptionRepository subscriptionRepository =
             Mockito.mock(SubscriptionRepository.class);
 
+    private final PlanRepository planRepository =
+            Mockito.mock(PlanRepository.class);
+
     private final SubscriptionService subscriptionService =
-            new SubscriptionService(subscriptionRepository);
+            new SubscriptionService(subscriptionRepository, planRepository);
 
 
     @Test
@@ -31,7 +38,7 @@ class SubscriptionServiceTest {
         CreateSubscriptionRequest request =
                 new CreateSubscriptionRequest(
                         "aaa@aa.com",
-                        11.0);
+                        "2");
 
         Mockito.when(subscriptionRepository.save(any())).
                 thenAnswer(i -> i.getArgument(0));
@@ -40,17 +47,19 @@ class SubscriptionServiceTest {
 
         assertNotNull(result);
         assertEquals("aaa@aa.com", result.getCustomerEmail());
-        assertEquals(11.0, result.getMonthlyPrice());
+        assertEquals("2", result.getPlan().getId());
 
     }
 
     @Test
     void shouldReturnAllSubscriptions(){
         //given
+       PlanEntity planEntity = planRepository.findById("2").orElseThrow(()->new  PlanNotFoundException("2"));
+
        SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
                "1",
                "ww@ww.com",
-               20.0);
+               planEntity);
          List<SubscriptionEntity> entityList = List.of(subscriptionEntity);
 
          Mockito.when(subscriptionRepository.findAll()).thenReturn(entityList);
@@ -60,15 +69,16 @@ class SubscriptionServiceTest {
          assertEquals(list.size(), entityList.size());
          assertEquals("1", list.get(0).getId());
         assertEquals("ww@ww.com", list.get(0).getCustomerEmail());
-        assertEquals(20.0, list.get(0).getMonthlyPrice());
+        assertEquals("2", list.get(0).getPlan().getId());
     }
 
     @Test
     void shouldReturnSubscriptionById(){
+        PlanEntity planEntity = planRepository.findById("2").orElseThrow(()->new  PlanNotFoundException("2"));
         SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
                 "1",
                 "ww@ww.com",
-                20.0);
+                planEntity);
 
         Mockito.when(subscriptionRepository.findById(any()))
                 .thenReturn((Optional.of(subscriptionEntity)));
@@ -79,15 +89,16 @@ class SubscriptionServiceTest {
         assertNotNull(subscriptionFound);
         assertEquals("1",subscriptionFound.getId() );
         assertEquals("ww@ww.com",subscriptionFound.getCustomerEmail() );
-        assertEquals(20.0,subscriptionFound.getMonthlyPrice() );
+        assertEquals("2",subscriptionFound.getPlan().getId());
     }
 
     @Test
   void shouldDeleteASubscriptionById(){
+      PlanEntity planEntity = planRepository.findById("2").orElseThrow(()->new  PlanNotFoundException("2"));
       SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
               "1",
               "ww@ww.com",
-              20.0);
+              planEntity);
 
 
       Mockito.when(subscriptionRepository.findById("1"))
@@ -108,12 +119,14 @@ class SubscriptionServiceTest {
     void shouldUpdateASubscription(){
       UpdateSubscriptionRequest request = new UpdateSubscriptionRequest(
               "hola@hola.com",
-                3.0);
+                "2");
+
+       PlanEntity planEntity = planRepository.findById("2").orElseThrow(()->new  PlanNotFoundException("2"));
 
       SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
               "1",
               "ww@ww.com",
-              20.0);
+              planEntity);
 
 
        Mockito.when(subscriptionRepository.findById("1"))
@@ -128,7 +141,7 @@ class SubscriptionServiceTest {
 
 
     assertEquals("hola@hola.com",subscriptionEntity.getCustomerEmail() );
-    assertEquals(3.0, subscriptionEntity.getMonthlyPrice());
+    assertEquals("2", subscriptionEntity.getPlan().getId());
 
   }
 

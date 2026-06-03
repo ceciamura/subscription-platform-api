@@ -1,15 +1,17 @@
 package com.subscription.demo.web.response;
 
+import com.subscription.demo.domain.Plan;
+
 public class SubscriptionResponse {
 
     private String id;
     private String customerEmail;
-    private Double monthlyPrice;
+    private Plan plan;
 
-    public SubscriptionResponse(String id, String customerEmail, Double monthlyPrice) {
+    public SubscriptionResponse(String id, String customerEmail, Plan plan) {
         this.id = id;
         this.customerEmail = customerEmail;
-        this.monthlyPrice = monthlyPrice;
+        this.plan = plan;
     }
 
     public String getId() {
@@ -20,7 +22,7 @@ public class SubscriptionResponse {
         return customerEmail;
     }
 
-    public Double getMonthlyPrice() {
-        return monthlyPrice;
+    public Plan getPlan() {
+        return plan;
     }
 }

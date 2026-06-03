@@ -1,6 +1,7 @@
 package com.subscription.demo.web;
 
 import com.subscription.demo.application.SubscriptionService;
+import com.subscription.demo.domain.Plan;
 import com.subscription.demo.domain.Subscription;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import com.subscription.demo.web.request.UpdateSubscriptionRequest;
@@ -37,10 +38,11 @@ class SubscriptionControllerTest {
     @Test
     void shouldCreateANewSubscription() throws Exception {
         CreateSubscriptionRequest request = new CreateSubscriptionRequest(
-                "aa@aa.com", 10.0);
+                "aa@aa.com", "2");
+        Plan plan = new Plan("2", "aaa", 10.0);
 
        Subscription subscription = new Subscription(
-                "1","aa@aa.com" , 10.0);
+                "1","aa@aa.com" , plan);
 
         Mockito.when(subscriptionService.newSubscription(any()))
                 .thenReturn(subscription);
@@ -52,13 +54,16 @@ class SubscriptionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.customerEmail").value("aa@aa.com"))
-                .andExpect(jsonPath("$.monthlyPrice").value(10.0));
+                .andExpect(jsonPath("$.plan.id").value("2"))
+                .andExpect(jsonPath("$.plan.name").value("aaa"))
+                .andExpect(jsonPath("$.plan.monthlyPrice").value(10.0));
     }
 
     @Test
     void shouldReturnAllSubscriptions() throws Exception {
+        Plan plan = new Plan("2", "aaa", 10.0);
         Subscription subscription = new Subscription(
-                "1","aa@aa.com" , 10.0);
+                "1","aa@aa.com" , plan);
 
         List<Subscription> list = List.of(subscription);
 
@@ -71,16 +76,20 @@ class SubscriptionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value("1"))
                 .andExpect(jsonPath("$[0].customerEmail").value("aa@aa.com"))
-                .andExpect( jsonPath("$[0].monthlyPrice", is(10.0)));
+                .andExpect( jsonPath("$[0].plan.id", is("2")))
+                .andExpect( jsonPath("$[0].plan.name", is("aaa")))
+                .andExpect( jsonPath("$[0].plan.monthlyPrice", is(10.0)));
 
 
     }
 
     @Test
     void shouldReturnASubscriptionById() throws Exception {
+        Plan plan = new Plan("2", "aaa", 10.0);
+
 
         Subscription subscription = new Subscription(
-                "1","aa@aa.com" , 10.0);
+                "1","aa@aa.com" , plan);
 
         Mockito.when(subscriptionService.getSubscriptionById("1")).
                thenReturn(subscription);
@@ -92,7 +101,9 @@ class SubscriptionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.customerEmail").value("aa@aa.com"))
-                .andExpect(jsonPath("$.monthlyPrice").value(10.0));
+                .andExpect(jsonPath("$.plan.id").value("2"))
+                .andExpect(jsonPath("$.plan.name").value("aaa"))
+                .andExpect(jsonPath("$.plan.monthlyPrice").value(10.0));
     }
 
     @Test
@@ -112,10 +123,12 @@ class SubscriptionControllerTest {
     @Test
     void shouldUpdateSubscription() throws Exception {
         UpdateSubscriptionRequest request = new UpdateSubscriptionRequest(
-                "aa@aa.com", 50.0);
+                "aa@aa.com", "2");
+
+        Plan plan = new Plan("2", "aaa", 10.0);
 
         Mockito.when(subscriptionService.updateSubscription(Mockito.any(UpdateSubscriptionRequest.class), Mockito.eq("1")))
-                .thenReturn(new Subscription("1","aa@aa.com", 50.0 ));
+                .thenReturn(new Subscription("1","aa@aa.com", plan ));
 
 
         mockMvc.perform(
@@ -125,6 +138,8 @@ class SubscriptionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.customerEmail").value("aa@aa.com"))
-                .andExpect(jsonPath("$.monthlyPrice").value(50.0));
+                .andExpect(jsonPath("$.plan.id").value("2"))
+                .andExpect(jsonPath("$.plan.name").value("aaa"))
+                .andExpect(jsonPath("$.plan.monthlyPrice").value(10.0));
     }
 }

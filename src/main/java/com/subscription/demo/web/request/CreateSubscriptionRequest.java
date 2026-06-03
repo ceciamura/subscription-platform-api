@@ -7,15 +7,15 @@ public class CreateSubscriptionRequest {
 
     @NotBlank
     private String customerEmail;
-    @Positive
-    private Double monthlyPrice;
+    @NotBlank
+    private String planId;
 
     public CreateSubscriptionRequest() {
     }
 
-    public CreateSubscriptionRequest(String customerEmail, Double monthlyPrice) {
+    public CreateSubscriptionRequest(String customerEmail, String planId) {
         this.customerEmail = customerEmail;
-        this.monthlyPrice = monthlyPrice;
+        this.planId = planId;
     }
 
     public String getCustomerEmail() {
@@ -26,19 +26,19 @@ public class CreateSubscriptionRequest {
         this.customerEmail = customerEmail;
     }
 
-    public Double getMonthlyPrice() {
-        return monthlyPrice;
+    public String getPlanId() {
+        return planId;
     }
 
-    public void setMonthlyPrice(Double monthlyPrice) {
-        this.monthlyPrice = monthlyPrice;
+    public void setPlanId(String plan_id) {
+        this.planId = plan_id;
     }
 
     @Override
     public String toString() {
         return "CreateSubscriptionRequest{" +
                 "customerEmail='" + customerEmail + '\'' +
-                ", monthlyPrice=" + monthlyPrice +
+                ", plan_id='" + planId + '\'' +
                 '}';
     }
 }

@@ -9,7 +9,7 @@ public class SubscriptionResponseMapper {
             return new SubscriptionResponse(
                     subscription.getId(),
                     subscription.getCustomerEmail(),
-                    subscription.getMonthlyPrice());
+                    subscription.getPlan());
 
     }
 }

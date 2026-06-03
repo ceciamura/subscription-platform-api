@@ -6,19 +6,28 @@ import jakarta.validation.constraints.Positive;
 public class UpdateSubscriptionRequest {
     @NotBlank
     private String customerEmail;
-    @Positive
-    private Double monthlyPrice;
+    @NotBlank
+    private String planId;
 
-    public UpdateSubscriptionRequest(String customerEmail, Double monthlyPrice) {
+
+    public UpdateSubscriptionRequest(String customerEmail, String planId) {
         this.customerEmail = customerEmail;
-        this.monthlyPrice = monthlyPrice;
+        this.planId = planId;
     }
 
     public String getCustomerEmail() {
         return customerEmail;
     }
 
-    public Double getMonthlyPrice() {
-        return monthlyPrice;
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
+    public String getPlanId() {
+        return planId;
+    }
+
+    public void setPlanId(String plan_id) {
+        this.planId = plan_id;
     }
 }

@@ -7,15 +7,15 @@ public class Subscription {
 
     private String id;
     private String customerEmail;
-    private Double monthlyPrice;
+    private Plan plan;
 
     public Subscription() {
     }
 
-    public Subscription(String id, String customerEmail, Double monthlyPrice) {
+    public Subscription(String id, String customerEmail, Plan plan) {
         this.id = id;
         this.customerEmail = customerEmail;
-        this.monthlyPrice = monthlyPrice;
+        this.plan = plan;
     }
 
     public String getId() {
@@ -34,12 +34,12 @@ public class Subscription {
         this.customerEmail = customerEmail;
     }
 
-    public Double getMonthlyPrice() {
-        return monthlyPrice;
+    public Plan getPlan() {
+        return plan;
     }
 
-    public void setMonthlyPrice(Double monthlyPrice) {
-        this.monthlyPrice = monthlyPrice;
+    public void setPlan(Plan plan) {
+        this.plan = plan;
     }
 
     @Override
@@ -47,7 +47,7 @@ public class Subscription {
         return "Subscription{" +
                 "id='" + id + '\'' +
                 ", customerEmail='" + customerEmail + '\'' +
-                ", monthlyPrice=" + monthlyPrice +
+                ", plan=" + plan +
                 '}';
     }
 }
