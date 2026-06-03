@@ -36,4 +36,11 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
 
     }
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(PlanNotFoundException.class)
+    public ErrorResponse handlePlanNotFound(PlanNotFoundException exception){
+
+        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), exception.getMessage());
+
+    }
 }

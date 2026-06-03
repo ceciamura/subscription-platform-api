@@ -2,7 +2,7 @@ package com.subscription.demo.web;
 
 import com.subscription.demo.application.SubscriptionService;
 import com.subscription.demo.domain.Subscription;
-import com.subscription.demo.web.mapper.ResponseMapper;
+import com.subscription.demo.web.mapper.SubscriptionResponseMapper;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import com.subscription.demo.web.request.UpdateSubscriptionRequest;
 import com.subscription.demo.web.response.SubscriptionResponse;
@@ -31,7 +31,7 @@ public class SubscriptionController {
                                                 @Valid @RequestBody CreateSubscriptionRequest subscription){
         Subscription newSubscription = subscriptionService.newSubscription(subscription);
 
-        return ResponseMapper.toResponse(newSubscription);
+        return SubscriptionResponseMapper.toResponse(newSubscription);
 
     }
     @Operation(summary = "Get all subscriptions")
@@ -39,7 +39,7 @@ public class SubscriptionController {
     public List<SubscriptionResponse> getSubscriptions(){
         List<Subscription> subscriptionList = subscriptionService.getSubscriptions();
         return subscriptionList.stream()
-                .map(ResponseMapper::toResponse).toList();
+                .map(SubscriptionResponseMapper::toResponse).toList();
     }
 
     @Operation(summary = "Get a subscription by ID")
@@ -48,7 +48,7 @@ public class SubscriptionController {
                                                     @PathVariable(name = "id") String id){
 
         Subscription subscription = subscriptionService.getSubscriptionById(id);
-        return ResponseMapper.toResponse(subscription);
+        return SubscriptionResponseMapper.toResponse(subscription);
     }
     @Operation(summary = "Delete a subscription by ID")
     @DeleteMapping("/subscriptions/{id}")
@@ -66,6 +66,6 @@ public class SubscriptionController {
                                                    @PathVariable(name = "id") String id){
         Subscription subscription = subscriptionService.updateSubscription(request, id);
 
-        return ResponseMapper.toResponse(subscription);
+        return SubscriptionResponseMapper.toResponse(subscription);
     }
 }
