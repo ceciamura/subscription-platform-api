@@ -1,8 +1,11 @@
 package com.subscription.demo.application;
 
 import com.subscription.demo.domain.Plan;
+import com.subscription.demo.domain.Subscription;
 import com.subscription.demo.infrastucture.persistence.PlanEntity;
 import com.subscription.demo.infrastucture.persistence.PlanRepository;
+import com.subscription.demo.infrastucture.persistence.SubscriptionEntity;
+import com.subscription.demo.infrastucture.persistence.SubscriptionRepository;
 import com.subscription.demo.web.exception.PlanNotFoundException;
 import com.subscription.demo.web.request.CreatePlanRequest;
 import com.subscription.demo.web.request.UpdatePlanRequest;
@@ -18,11 +21,14 @@ import java.util.UUID;
 public class PlanService {
 
     private final  PlanRepository planRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Autowired
-    public PlanService(PlanRepository planRepository) {
+    public PlanService(PlanRepository planRepository, SubscriptionRepository subscriptionRepository) {
         this.planRepository = planRepository;
+        this.subscriptionRepository = subscriptionRepository;
     }
+
 
     public Plan createNewPlan(@Valid CreatePlanRequest createPlanRequest){
 
@@ -77,4 +83,25 @@ public class PlanService {
 
         return new Plan(planUpdated.getId(), planUpdated.getName(), planUpdated.getMonthlyPlan());
     }
+
+    public List<Subscription>getSubscriptionByIdPlan(String planId){
+        planRepository.findById(planId)
+                .orElseThrow(() -> new PlanNotFoundException(planId));
+
+        List<SubscriptionEntity> entities =
+                subscriptionRepository.findByPlanId(planId);
+
+        return entities.stream()
+                .map(entity -> new Subscription(
+                        entity.getId(),
+                        entity.getCustomerEmail(),
+                        new Plan(
+                                entity.getPlan().getId(),
+                                entity.getPlan().getName(),
+                                entity.getPlan().getMonthlyPlan()
+                        )
+                ))
+                .toList();
+    }
+
 }

@@ -3,15 +3,14 @@ package com.subscription.demo.application;
 import com.subscription.demo.domain.Plan;
 import com.subscription.demo.infrastucture.persistence.PlanEntity;
 import com.subscription.demo.infrastucture.persistence.PlanRepository;
+import com.subscription.demo.infrastucture.persistence.SubscriptionRepository;
 import com.subscription.demo.web.request.CreatePlanRequest;
 import com.subscription.demo.web.request.UpdatePlanRequest;
-import com.subscription.demo.web.request.UpdateSubscriptionRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,8 +19,9 @@ import static org.mockito.ArgumentMatchers.any;
 public class PlanServiceTest {
 
     private final PlanRepository repository = Mockito.mock(PlanRepository.class);
+    private final SubscriptionRepository subscriptionRepository = Mockito.mock(SubscriptionRepository.class);
 
-    private final PlanService planService = new PlanService(repository);
+    private final PlanService planService = new PlanService(repository, subscriptionRepository);
 
 
     @Test

@@ -56,6 +56,7 @@ public class SubscriptionService {
     public List<Subscription> getSubscriptions() {
         List<SubscriptionEntity> subscriptionEntityList = subscriptionRepository.findAll();
 
+
         return subscriptionEntityList.stream()
                 .map(entity -> new Subscription(
                         entity.getId(),

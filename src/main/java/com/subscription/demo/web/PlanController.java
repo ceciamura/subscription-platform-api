@@ -2,10 +2,13 @@ package com.subscription.demo.web;
 
 import com.subscription.demo.application.PlanService;
 import com.subscription.demo.domain.Plan;
+import com.subscription.demo.domain.Subscription;
 import com.subscription.demo.web.mapper.PlanResponseMapper;
+import com.subscription.demo.web.mapper.SubscriptionResponseMapper;
 import com.subscription.demo.web.request.CreatePlanRequest;
 import com.subscription.demo.web.request.UpdatePlanRequest;
 import com.subscription.demo.web.response.PlanResponse;
+import com.subscription.demo.web.response.SubscriptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
@@ -83,6 +86,17 @@ public class PlanController {
         Plan plan = planService.updatePlan(request, id);
 
         return PlanResponseMapper.toResponse(plan);
+    }
+
+    @GetMapping("/plans/{id}/subscriptions")
+    public List<SubscriptionResponse> getSubscriptionsByIdPlan(@Parameter(description = "Plan ID")
+                                                                   @PathVariable(name = "id") String id){
+
+        List<Subscription> subscriptionList = planService.getSubscriptionByIdPlan(id);
+
+        return subscriptionList.stream()
+                .map(SubscriptionResponseMapper::toResponse)
+                .toList();
     }
 
 
