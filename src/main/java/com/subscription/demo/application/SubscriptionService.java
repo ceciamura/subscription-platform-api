@@ -11,6 +11,10 @@ import com.subscription.demo.web.exception.SubscriptionNotFoundException;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import com.subscription.demo.web.request.UpdateSubscriptionRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -79,7 +83,7 @@ public class SubscriptionService {
         SubscriptionEntity entity = subscriptionRepository.findById(id)
                 .orElseThrow(() -> new SubscriptionNotFoundException(id));
 
-        subscriptionRepository.delete(entity);
+        subscriptionRepository.deleteById(entity.getId());
     }
 
     public Subscription updateSubscription(UpdateSubscriptionRequest request, String id) {
@@ -96,5 +100,24 @@ public class SubscriptionService {
 
         return new Subscription(updatedSubscription.getId(), updatedSubscription.getCustomerEmail(), new Plan(entity.getPlan().getId(), entity.getPlan().getName(), entity.getPlan().getMonthlyPlan()));
 
+    }
+
+    public Page<Subscription> getSubscriptionPage(int page, int size, String sortBy, String direction){
+
+        Sort sort = direction.equalsIgnoreCase("desc")
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return subscriptionRepository.findAll(pageable)
+                .map(entity -> new Subscription(
+                        entity.getId(),
+                        entity.getCustomerEmail(),
+                        new Plan(
+                                entity.getPlan().getId(),
+                                entity.getPlan().getName(),
+                                entity.getPlan().getMonthlyPlan()
+                        )
+                ));
     }
 }

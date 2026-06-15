@@ -11,6 +11,7 @@ import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import com.subscription.demo.web.request.UpdateSubscriptionRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.*;
 
 
 import java.util.List;
@@ -40,6 +41,11 @@ class SubscriptionServiceTest {
                         "aaa@aa.com",
                         "2");
 
+        PlanEntity planEntity = new PlanEntity("2", "Premium", 20.0);
+
+        Mockito.when(planRepository.findById("2"))
+                .thenReturn(Optional.of(planEntity));
+
         Mockito.when(subscriptionRepository.save(any())).
                 thenAnswer(i -> i.getArgument(0));
 
@@ -54,7 +60,10 @@ class SubscriptionServiceTest {
     @Test
     void shouldReturnAllSubscriptions(){
         //given
-       PlanEntity planEntity = planRepository.findById("2").orElseThrow(()->new  PlanNotFoundException("2"));
+        PlanEntity planEntity = new PlanEntity("2", "Premium", 20.0);
+
+        Mockito.when(planRepository.findById("2"))
+                .thenReturn(Optional.of(planEntity));;
 
        SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
                "1",
@@ -74,12 +83,16 @@ class SubscriptionServiceTest {
 
     @Test
     void shouldReturnSubscriptionById(){
-        PlanEntity planEntity = planRepository.findById("2").orElseThrow(()->new  PlanNotFoundException("2"));
+        PlanEntity planEntity = new PlanEntity("2", "Premium", 20.0);
+
+
         SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
                 "1",
                 "ww@ww.com",
                 planEntity);
 
+        Mockito.when(planRepository.findById("2"))
+                .thenReturn(Optional.of(planEntity));
         Mockito.when(subscriptionRepository.findById(any()))
                 .thenReturn((Optional.of(subscriptionEntity)));
 
@@ -94,13 +107,15 @@ class SubscriptionServiceTest {
 
     @Test
   void shouldDeleteASubscriptionById(){
-      PlanEntity planEntity = planRepository.findById("2").orElseThrow(()->new  PlanNotFoundException("2"));
+        PlanEntity planEntity = new PlanEntity("2", "Premium", 20.0);
       SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
               "1",
               "ww@ww.com",
               planEntity);
 
 
+        Mockito.when(planRepository.findById("2"))
+                .thenReturn(Optional.of(planEntity));
       Mockito.when(subscriptionRepository.findById("1"))
               .thenReturn((Optional.of(subscriptionEntity)));
 
@@ -121,14 +136,15 @@ class SubscriptionServiceTest {
               "hola@hola.com",
                 "2");
 
-       PlanEntity planEntity = planRepository.findById("2").orElseThrow(()->new  PlanNotFoundException("2"));
+       PlanEntity planEntity = new PlanEntity("2", "Premium", 20.0);
 
       SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
               "1",
               "ww@ww.com",
               planEntity);
 
-
+       Mockito.when(planRepository.findById("2"))
+               .thenReturn(Optional.of(planEntity));
        Mockito.when(subscriptionRepository.findById("1"))
                .thenReturn(java.util.Optional.of(subscriptionEntity));
         Mockito.when(subscriptionRepository.save(any(SubscriptionEntity.class)))
@@ -143,6 +159,29 @@ class SubscriptionServiceTest {
     assertEquals("hola@hola.com",subscriptionEntity.getCustomerEmail() );
     assertEquals("2", subscriptionEntity.getPlan().getId());
 
+  }
+
+  @Test
+   void shouldReturnSubscriptionPage(){
+      PlanEntity planEntity = new PlanEntity("1", "Premium", 20.0);
+
+      SubscriptionEntity entity =
+              new SubscriptionEntity("1", "hola@hola.com", planEntity);
+
+
+      Sort sort = Sort.by("customerEmail").descending();
+        Pageable pageable = PageRequest.of(0, 2, sort);
+
+      Page<SubscriptionEntity> page = new PageImpl<>(List.of(entity),pageable,1);
+
+        Mockito.when(subscriptionRepository.findAll(any(Pageable.class)))
+                .thenReturn(page);
+
+        Page<Subscription> result = subscriptionService.getSubscriptionPage(0, 2,
+                "customerEmail", "desc");
+
+        assertEquals(1, result.getContent().size());
+        assertEquals("hola@hola.com", result.getContent().get(0).getCustomerEmail());
   }
 
 }

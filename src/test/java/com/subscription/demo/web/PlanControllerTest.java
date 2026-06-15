@@ -2,6 +2,7 @@ package com.subscription.demo.web;
 
 import com.subscription.demo.application.PlanService;
 import com.subscription.demo.domain.Plan;
+import com.subscription.demo.domain.Subscription;
 import com.subscription.demo.web.request.CreatePlanRequest;
 import com.subscription.demo.web.request.UpdatePlanRequest;
 import org.junit.jupiter.api.Test;
@@ -118,6 +119,26 @@ public class PlanControllerTest {
                 .andExpect(jsonPath("$.monthlyPrice").value(plan.getMonthlyPrice()));
 
 
+    }
+
+    @Test
+    public void shouldReturnSubscriptionListByIdPlan() throws  Exception{
+        List<Subscription> subscriptionList = List.of(new Subscription(
+                "1",
+                "aa",
+                new Plan("2", "bb", 10.0)));
+
+        Mockito.when(planService.getSubscriptionByIdPlan(any())).thenReturn(subscriptionList);
+
+        mockMvc.perform(
+                get("/plans/2/subscriptions")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("[0].id").value("1"))
+                .andExpect(jsonPath("[0].customerEmail").value("aa"))
+                .andExpect(jsonPath("[0].plan.id").value("2"))
+                .andExpect(jsonPath("[0].plan.name").value("bb"))
+                .andExpect(jsonPath("[0].plan.monthlyPrice").value(10.0));
     }
     }
 

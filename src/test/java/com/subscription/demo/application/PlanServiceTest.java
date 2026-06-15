@@ -1,8 +1,10 @@
 package com.subscription.demo.application;
 
 import com.subscription.demo.domain.Plan;
+import com.subscription.demo.domain.Subscription;
 import com.subscription.demo.infrastucture.persistence.PlanEntity;
 import com.subscription.demo.infrastucture.persistence.PlanRepository;
+import com.subscription.demo.infrastucture.persistence.SubscriptionEntity;
 import com.subscription.demo.infrastucture.persistence.SubscriptionRepository;
 import com.subscription.demo.web.request.CreatePlanRequest;
 import com.subscription.demo.web.request.UpdatePlanRequest;
@@ -106,9 +108,34 @@ public class PlanServiceTest {
         assertEquals("aa", entity.getName());
         assertEquals(10.0, entity.getMonthlyPlan());
 
-        Mockito.verify(repository, Mockito.times(1)).deleteById("1");
+        Mockito.verify(repository, Mockito.times(1)).findById("1");
+
+        Mockito.verify(repository, Mockito.times(1)).save(entity);
 
     }
+
+    @Test
+    public void shouldReturnListOfSubscriptionByIdPlan(){
+
+        PlanEntity entity = new PlanEntity("1", "aa", 10.0);
+        List<SubscriptionEntity> subscriptionEntityList =
+                List.of(new SubscriptionEntity("2", "cc", entity));
+
+        Mockito.when(repository.findById(entity.getId()))
+                .thenReturn(Optional.of(entity));
+
+        Mockito.when(subscriptionRepository.findByPlanId(entity.getId()))
+                .thenReturn(subscriptionEntityList);
+
+        List<Subscription> result =
+                planService.getSubscriptionByIdPlan("1");
+
+        assertEquals(1, result.size());
+        assertEquals("cc", result.get(0).getCustomerEmail());
+        assertEquals("1", result.get(0).getPlan().getId());
+
+    }
+
 
 }
 

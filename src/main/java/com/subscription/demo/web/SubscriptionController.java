@@ -9,6 +9,7 @@ import com.subscription.demo.web.response.SubscriptionResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,5 +68,16 @@ public class SubscriptionController {
         Subscription subscription = subscriptionService.updateSubscription(request, id);
 
         return SubscriptionResponseMapper.toResponse(subscription);
+    }
+
+    @GetMapping("/subscriptions/page")
+    public Page<SubscriptionResponse> getSubscriptionPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "customerEmail") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction)
+    {
+        return subscriptionService.getSubscriptionPage(page, size, sortBy, direction)
+                .map(SubscriptionResponseMapper::toResponse);
     }
 }
