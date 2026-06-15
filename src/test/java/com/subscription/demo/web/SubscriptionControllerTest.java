@@ -45,16 +45,16 @@ class SubscriptionControllerTest {
                 "aa@aa.com", "2");
         Plan plan = new Plan("2", "aaa", 10.0);
 
-       Subscription subscription = new Subscription(
-                "1","aa@aa.com" , plan);
+        Subscription subscription = new Subscription(
+                "1", "aa@aa.com", plan);
 
         Mockito.when(subscriptionService.newSubscription(any()))
                 .thenReturn(subscription);
 
         mockMvc.perform(
-                post("/subscriptions")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        post("/subscriptions")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.customerEmail").value("aa@aa.com"))
@@ -67,7 +67,7 @@ class SubscriptionControllerTest {
     void shouldReturnAllSubscriptions() throws Exception {
         Plan plan = new Plan("2", "aaa", 10.0);
         Subscription subscription = new Subscription(
-                "1","aa@aa.com" , plan);
+                "1", "aa@aa.com", plan);
 
         List<Subscription> list = List.of(subscription);
 
@@ -75,14 +75,14 @@ class SubscriptionControllerTest {
                 .thenReturn(list);
 
         mockMvc.perform(
-                get("/subscriptions")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        get("/subscriptions")
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value("1"))
                 .andExpect(jsonPath("$[0].customerEmail").value("aa@aa.com"))
-                .andExpect( jsonPath("$[0].plan.id", is("2")))
-                .andExpect( jsonPath("$[0].plan.name", is("aaa")))
-                .andExpect( jsonPath("$[0].plan.monthlyPrice", is(10.0)));
+                .andExpect(jsonPath("$[0].plan.id", is("2")))
+                .andExpect(jsonPath("$[0].plan.name", is("aaa")))
+                .andExpect(jsonPath("$[0].plan.monthlyPrice", is(10.0)));
 
 
     }
@@ -93,10 +93,10 @@ class SubscriptionControllerTest {
 
 
         Subscription subscription = new Subscription(
-                "1","aa@aa.com" , plan);
+                "1", "aa@aa.com", plan);
 
         Mockito.when(subscriptionService.getSubscriptionById("1")).
-               thenReturn(subscription);
+                thenReturn(subscription);
 
 
         mockMvc.perform(
@@ -132,7 +132,7 @@ class SubscriptionControllerTest {
         Plan plan = new Plan("2", "aaa", 10.0);
 
         Mockito.when(subscriptionService.updateSubscription(Mockito.any(UpdateSubscriptionRequest.class), Mockito.eq("1")))
-                .thenReturn(new Subscription("1","aa@aa.com", plan ));
+                .thenReturn(new Subscription("1", "aa@aa.com", plan));
 
 
         mockMvc.perform(
@@ -147,50 +147,70 @@ class SubscriptionControllerTest {
                 .andExpect(jsonPath("$.plan.monthlyPrice").value(10.0));
     }
 
-        @Test
-        void shouldReturnSubscriptionPage() throws Exception {
-            Plan plan = new Plan("2", "aaa", 10.0);
+    @Test
+    void shouldReturnSubscriptionPage() throws Exception {
+        Plan plan = new Plan("2", "aaa", 10.0);
 
-            Subscription subscription = new Subscription(
-                    "1","aa@aa.com" , plan);
+        Subscription subscription = new Subscription(
+                "1", "aa@aa.com", plan);
 
 
-            Page<Subscription> page =
-                    new PageImpl<>(List.of(
-                            new Subscription(
-                                    "1",
-                                    "hola@hola.com",
-                                    new Plan("1", "Premium", 20.0)
-                            )
-                    ));
+        Page<Subscription> page =
+                new PageImpl<>(List.of(
+                        new Subscription(
+                                "1",
+                                "hola@hola.com",
+                                new Plan("1", "Premium", 20.0)
+                        )
+                ));
 
-            Mockito.when(subscriptionService.getSubscriptionPage(
-                    0,
-                    2,
-                    "customerEmail",
-                    "desc"
-            )).thenReturn(page);
+        Mockito.when(subscriptionService.getSubscriptionPage(
+                0,
+                2,
+                "customerEmail",
+                "desc"
+        )).thenReturn(page);
 
-            mockMvc.perform(
-                            get("/subscriptions/page")
-                                    .param("page", "0")
-                                    .param("size", "2")
-                                    .param("sortBy", "customerEmail")
-                                    .param("direction", "desc")
-                    )
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.content[0].id").value("1"))
-                    .andExpect(jsonPath("$.content[0].customerEmail").value("hola@hola.com"))
-                    .andExpect(jsonPath("$.content[0].plan.id").value("1"));
+        mockMvc.perform(
+                        get("/subscriptions/page")
+                                .param("page", "0")
+                                .param("size", "2")
+                                .param("sortBy", "customerEmail")
+                                .param("direction", "desc")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value("1"))
+                .andExpect(jsonPath("$.content[0].customerEmail").value("hola@hola.com"))
+                .andExpect(jsonPath("$.content[0].plan.id").value("1"));
 
-            Mockito.verify(subscriptionService).getSubscriptionPage(
-                    0,
-                    2,
-                    "customerEmail",
-                    "desc"
-            );
-        }
+        Mockito.verify(subscriptionService).getSubscriptionPage(
+                0,
+                2,
+                "customerEmail",
+                "desc"
+        );
+    }
+
+    @Test
+    void shouldReturnSubscriptionListSEarchingByEmail() throws Exception {
+        Plan plan = new Plan("2", "aaa", 10.0);
+
+        Subscription subscription = new Subscription(
+                "1", "aa@aa.com", plan);
+
+        List<Subscription> list = List.of(subscription);
+
+        Mockito.when(subscriptionService.getSubscriptionsByEmailSearch("aa"))
+                .thenReturn(list);
+
+        mockMvc.perform(
+                        get("/subscriptions/search")
+                                .param("email", "aa")
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].customerEmail").value("aa@aa.com"));
 
     }
 
-
+}

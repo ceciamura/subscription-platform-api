@@ -184,6 +184,26 @@ class SubscriptionServiceTest {
         assertEquals("hola@hola.com", result.getContent().get(0).getCustomerEmail());
   }
 
+  @Test
+   void shouldReturnSubscriptionListByEmailSearch(){
+      PlanEntity planEntity = new PlanEntity("2", "Premium", 20.0);
+
+      Mockito.when(planRepository.findById("2"))
+              .thenReturn(Optional.of(planEntity));;
+
+      SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
+              "1",
+              "ww@ww.com",
+              planEntity);
+      List<SubscriptionEntity> entityList = List.of(subscriptionEntity);
+
+      Mockito.when(subscriptionRepository.findByCustomerEmailContainingIgnoreCase(any())).thenReturn(entityList);
+
+      List<Subscription> result = subscriptionService.getSubscriptionsByEmailSearch("ww");
+
+      assertEquals(1, result.size());
+      assertEquals("ww@ww.com", result.get(0).getCustomerEmail());
+  }
 }
 
 

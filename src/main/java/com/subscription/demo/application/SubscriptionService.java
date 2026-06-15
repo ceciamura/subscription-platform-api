@@ -120,4 +120,15 @@ public class SubscriptionService {
                         )
                 ));
     }
+
+    public List<Subscription> getSubscriptionsByEmailSearch(String email){
+        List<SubscriptionEntity> entities = subscriptionRepository.findByCustomerEmailContainingIgnoreCase(email);
+
+        return entities.stream()
+                .map(e -> new Subscription(e.getId(),
+                                          e.getCustomerEmail(),
+                                          new Plan(e.getPlan().getId(),
+                                                  e.getPlan().getName(),
+                                                  e.getPlan().getMonthlyPlan()))).toList();
+    }
 }

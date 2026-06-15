@@ -72,12 +72,29 @@ public class SubscriptionController {
 
     @GetMapping("/subscriptions/page")
     public Page<SubscriptionResponse> getSubscriptionPage(
+            @Parameter(description = "Page number, starts at 0", example = "0")
             @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Numer of records for pag", example = "5")
             @RequestParam(defaultValue = "5") int size,
+            @Parameter(description = "Field used for sorting", example = "customerEmail")
             @RequestParam(defaultValue = "customerEmail") String sortBy,
+            @Parameter(description = "Sort direction: asc or desc", example = "asc")
             @RequestParam(defaultValue = "asc") String direction)
     {
         return subscriptionService.getSubscriptionPage(page, size, sortBy, direction)
                 .map(SubscriptionResponseMapper::toResponse);
+    }
+
+    @Operation(summary = "Search subscriptions by email")
+    @GetMapping("/subscriptions/search")
+    public List<SubscriptionResponse> getSubscriptionByCustomerEmailSearch(
+            @Parameter(
+                    description = "Email text to search",
+                    example = "maria"
+            )
+            @RequestParam String email){
+
+        return subscriptionService.getSubscriptionsByEmailSearch(email)
+                .stream().map(SubscriptionResponseMapper::toResponse).toList();
     }
 }
