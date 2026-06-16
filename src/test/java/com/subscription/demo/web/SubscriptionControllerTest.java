@@ -212,5 +212,26 @@ class SubscriptionControllerTest {
                 .andExpect(jsonPath("$[0].customerEmail").value("aa@aa.com"));
 
     }
+    @Test
+    void shouldReturnSubscriptionListByPlanNameAndEmail() throws Exception{
+        Plan plan = new Plan("2", "aaa", 10.0);
 
+        Subscription subscription = new Subscription(
+                "1", "aa@aa.com", plan);
+
+        List<Subscription> list = List.of(subscription);
+
+        Mockito.when(subscriptionService.getSubscriptionByPlanNameAndCustomerEmail("aaa", "aa@aa.com"))
+                .thenReturn(list);
+
+           mockMvc.perform(
+                   get("/subscriptions/search/advanced")
+                           .param("planName", "aaa")
+                           .param("email", "aa@aa.com")
+                           .contentType(MediaType.APPLICATION_JSON)
+           ).andExpect(status().isOk())
+                   .andExpect(jsonPath("$[0].id").value("1"))
+                   .andExpect(jsonPath("$[0].customerEmail").value("aa@aa.com"));
+
+    }
 }

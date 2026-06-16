@@ -97,4 +97,16 @@ public class SubscriptionController {
         return subscriptionService.getSubscriptionsByEmailSearch(email)
                 .stream().map(SubscriptionResponseMapper::toResponse).toList();
     }
+
+    @Operation(summary = "Search subscriptions by plan and email")
+    @GetMapping("/subscriptions/search/advanced")
+    public List<SubscriptionResponse> getSubscriptionByPlanNameAndCustomerEmail(
+            @Parameter(description = "Plan Name")
+            @RequestParam String planName,
+            @Parameter(description = "Email text")
+            @RequestParam String email){
+
+        return subscriptionService.getSubscriptionByPlanNameAndCustomerEmail(planName, email)
+                .stream().map(SubscriptionResponseMapper::toResponse).toList();
+    }
 }

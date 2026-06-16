@@ -131,4 +131,15 @@ public class SubscriptionService {
                                                   e.getPlan().getName(),
                                                   e.getPlan().getMonthlyPlan()))).toList();
     }
+
+    public List<Subscription> getSubscriptionByPlanNameAndCustomerEmail(String planName, String email){
+        List<SubscriptionEntity> entities = subscriptionRepository.findByPlanNameContainingIgnoreCaseAndCustomerEmailContainingIgnoreCase(planName, email);
+
+        return entities.stream()
+                .map(e -> new Subscription(e.getId(),
+                        e.getCustomerEmail(),
+                        new Plan(e.getPlan().getId(),
+                                e.getPlan().getName(),
+                                e.getPlan().getMonthlyPlan()))).toList();
+    }
 }

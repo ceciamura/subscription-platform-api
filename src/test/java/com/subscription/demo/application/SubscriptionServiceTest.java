@@ -6,7 +6,7 @@ import com.subscription.demo.infrastucture.persistence.PlanEntity;
 import com.subscription.demo.infrastucture.persistence.PlanRepository;
 import com.subscription.demo.infrastucture.persistence.SubscriptionEntity;
 import com.subscription.demo.infrastucture.persistence.SubscriptionRepository;
-import com.subscription.demo.web.exception.PlanNotFoundException;
+
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
 import com.subscription.demo.web.request.UpdateSubscriptionRequest;
 import org.junit.jupiter.api.Test;
@@ -204,6 +204,32 @@ class SubscriptionServiceTest {
       assertEquals(1, result.size());
       assertEquals("ww@ww.com", result.get(0).getCustomerEmail());
   }
+
+  @Test
+    void shouldReturnSubscriptionListByPlanNameAndCustomerEmail(){
+
+          PlanEntity planEntity = new PlanEntity("2", "Premium",
+                  20.0);
+
+          Mockito.when(planRepository.findById("2"))
+                  .thenReturn(Optional.of(planEntity));;
+
+          SubscriptionEntity subscriptionEntity = new SubscriptionEntity(
+                  "1",
+                  "ww@ww.com",
+                  planEntity);
+          List<SubscriptionEntity> entityList = List.of(subscriptionEntity);
+
+          Mockito.when(subscriptionRepository.findByPlanNameContainingIgnoreCaseAndCustomerEmailContainingIgnoreCase(any(), any())).thenReturn(entityList);
+
+
+      List<Subscription> result = subscriptionService
+                  .getSubscriptionByPlanNameAndCustomerEmail("premiun", "ww@ww.com");
+                  assertEquals(1, result.size());
+                  assertEquals("ww@ww.com", result.get(0).getCustomerEmail());
+
+
+      }
 }
 
 
