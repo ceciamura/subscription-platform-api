@@ -81,4 +81,80 @@ public class SubscriptionIntegrationTest {
                 .andExpect(jsonPath("$[*].customerEmail").value(hasItem("integration@test.com")));
 
     }
+
+    @Test
+    void shouldReturnNotFoundWhenCreatingSubscriptionWithInvalidPlan() throws Exception {
+
+        String subscriptonJson= """
+                {
+                    "customerEmail": "integration@test.com",
+                    "planId": "invalid-plan"
+                }
+                """;
+
+        mockMvc.perform(post("/subscriptions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(subscriptonJson))
+                .andExpect(status().isNotFound());
+
+    }
+    @Test
+    void shouldSearchSubscriptionsByEmail() throws Exception{
+        String planJson = """
+                {
+                    "name": "Premium",
+                    "monthlyPrice": 20.0
+                }
+                """;
+
+        String planResponse = mockMvc.perform(post("/plans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(planJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.name").value("Premium"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        String planId = JsonPath.read(planResponse, "$.id");
+
+        String subscriptonJson= """
+                {
+                    "customerEmail": "integration@test.com",
+                    "planId": "%s"
+                }
+                """.formatted(planId);
+
+        mockMvc.perform(post("/subscriptions")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(subscriptonJson))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.customerEmail").value("integration@test.com"))
+                .andExpect(jsonPath("$.plan.id").value(planId))
+                .andExpect(jsonPath("$.plan.name").value("Premium"));
+
+
+        mockMvc.perform(get("/subscriptions/search")
+                .param("email", "integration")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].customerEmail").value(hasItem("integration@test.com")));
+    }
+
+    @Test
+    void shouldReturnPaginatedSubscriptions() throws Exception {
+
+        mockMvc.perform(get("/subscriptions/page")
+                .param("page", "0")
+                .param("size", "2")
+                .param("sortBy", "customerEmail")
+                .param("direction", "asc")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.size").value(2));
+
+    }
+
 }
