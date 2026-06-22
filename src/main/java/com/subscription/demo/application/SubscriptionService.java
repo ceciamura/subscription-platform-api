@@ -6,6 +6,7 @@ import com.subscription.demo.infrastucture.persistence.PlanEntity;
 import com.subscription.demo.infrastucture.persistence.PlanRepository;
 import com.subscription.demo.infrastucture.persistence.SubscriptionRepository;
 import com.subscription.demo.infrastucture.persistence.SubscriptionEntity;
+import com.subscription.demo.infrastucture.persistence.mapper.SubscriptionEntityMapper;
 import com.subscription.demo.web.exception.PlanNotFoundException;
 import com.subscription.demo.web.exception.SubscriptionNotFoundException;
 import com.subscription.demo.web.request.CreateSubscriptionRequest;
@@ -62,10 +63,7 @@ public class SubscriptionService {
 
 
         return subscriptionEntityList.stream()
-                .map(entity -> new Subscription(
-                        entity.getId(),
-                        entity.getCustomerEmail(),
-                        new Plan(entity.getPlan().getId(), entity.getPlan().getName(), entity.getPlan().getMonthlyPlan())))
+                .map(SubscriptionEntityMapper::toDomain)
                 .toList();
     }
 
@@ -75,7 +73,7 @@ public class SubscriptionService {
                 .orElseThrow(() -> new SubscriptionNotFoundException(id));
 
 
-        return new Subscription(entity.getId(), entity.getCustomerEmail(), new Plan(entity.getPlan().getId(), entity.getPlan().getName(), entity.getPlan().getMonthlyPlan()));
+        return SubscriptionEntityMapper.toDomain(entity);
     }
 
     public void deleteSubscriptionById(String id) {
@@ -98,8 +96,7 @@ public class SubscriptionService {
 
         SubscriptionEntity updatedSubscription = subscriptionRepository.save(entity);
 
-        return new Subscription(updatedSubscription.getId(), updatedSubscription.getCustomerEmail(), new Plan(entity.getPlan().getId(), entity.getPlan().getName(), entity.getPlan().getMonthlyPlan()));
-
+        return SubscriptionEntityMapper.toDomain(updatedSubscription);
     }
 
     public Page<Subscription> getSubscriptionPage(int page, int size, String sortBy, String direction){
@@ -110,36 +107,20 @@ public class SubscriptionService {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         return subscriptionRepository.findAll(pageable)
-                .map(entity -> new Subscription(
-                        entity.getId(),
-                        entity.getCustomerEmail(),
-                        new Plan(
-                                entity.getPlan().getId(),
-                                entity.getPlan().getName(),
-                                entity.getPlan().getMonthlyPlan()
-                        )
-                ));
+                .map(SubscriptionEntityMapper::toDomain);
     }
 
     public List<Subscription> getSubscriptionsByEmailSearch(String email){
         List<SubscriptionEntity> entities = subscriptionRepository.findByCustomerEmailContainingIgnoreCase(email);
 
         return entities.stream()
-                .map(e -> new Subscription(e.getId(),
-                                          e.getCustomerEmail(),
-                                          new Plan(e.getPlan().getId(),
-                                                  e.getPlan().getName(),
-                                                  e.getPlan().getMonthlyPlan()))).toList();
+                .map(SubscriptionEntityMapper::toDomain).toList();
     }
 
     public List<Subscription> getSubscriptionByPlanNameAndCustomerEmail(String planName, String email){
         List<SubscriptionEntity> entities = subscriptionRepository.findByPlanNameContainingIgnoreCaseAndCustomerEmailContainingIgnoreCase(planName, email);
 
         return entities.stream()
-                .map(e -> new Subscription(e.getId(),
-                        e.getCustomerEmail(),
-                        new Plan(e.getPlan().getId(),
-                                e.getPlan().getName(),
-                                e.getPlan().getMonthlyPlan()))).toList();
+                .map(SubscriptionEntityMapper::toDomain).toList();
     }
 }

@@ -6,6 +6,8 @@ import com.subscription.demo.infrastucture.persistence.PlanEntity;
 import com.subscription.demo.infrastucture.persistence.PlanRepository;
 import com.subscription.demo.infrastucture.persistence.SubscriptionEntity;
 import com.subscription.demo.infrastucture.persistence.SubscriptionRepository;
+import com.subscription.demo.infrastucture.persistence.mapper.PlanEntityMapper;
+import com.subscription.demo.infrastucture.persistence.mapper.SubscriptionEntityMapper;
 import com.subscription.demo.web.exception.PlanNotFoundException;
 import com.subscription.demo.web.request.CreatePlanRequest;
 import com.subscription.demo.web.request.UpdatePlanRequest;
@@ -46,9 +48,7 @@ public class PlanService {
 
         PlanEntity savedEntity = planRepository.save(planEntity);
 
-        return  new Plan(savedEntity.getId(),
-                savedEntity.getName(),
-                savedEntity.getMonthlyPlan());
+        return PlanEntityMapper.toDomain(savedEntity);
     }
 
     public List<Plan> getPlans(){
@@ -56,14 +56,14 @@ public class PlanService {
         List<PlanEntity> entityList = planRepository.findAll();
 
         return entityList.stream()
-                .map(entity -> new Plan(entity.getId(), entity.getName(), entity.getMonthlyPlan()))
+                .map(PlanEntityMapper::toDomain)
                 .toList();
     }
 
     public Plan getPlanById(String id){
         PlanEntity entity = planRepository.findById(id)
                 .orElseThrow(()-> new PlanNotFoundException(id));
-        return new Plan(entity.getId(), entity.getName(), entity.getMonthlyPlan());
+        return PlanEntityMapper.toDomain(entity);
     }
 
     public void deletePlanById(String id){
@@ -81,7 +81,7 @@ public class PlanService {
 
         PlanEntity planUpdated = planRepository.save(planFound);
 
-        return new Plan(planUpdated.getId(), planUpdated.getName(), planUpdated.getMonthlyPlan());
+        return PlanEntityMapper.toDomain(planUpdated);
     }
 
     public List<Subscription>getSubscriptionByIdPlan(String planId){
@@ -92,15 +92,7 @@ public class PlanService {
                 subscriptionRepository.findByPlanId(planId);
 
         return entities.stream()
-                .map(entity -> new Subscription(
-                        entity.getId(),
-                        entity.getCustomerEmail(),
-                        new Plan(
-                                entity.getPlan().getId(),
-                                entity.getPlan().getName(),
-                                entity.getPlan().getMonthlyPlan()
-                        )
-                ))
+                .map(SubscriptionEntityMapper::toDomain)
                 .toList();
     }
 
