@@ -12,6 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -100,6 +102,8 @@ public class SubscriptionIntegrationTest {
     }
     @Test
     void shouldSearchSubscriptionsByEmail() throws Exception{
+
+        String email = "integration-" + UUID.randomUUID() + "@test.com";
         String planJson = """
                 {
                     "name": "Premium",
@@ -119,18 +123,18 @@ public class SubscriptionIntegrationTest {
 
         String planId = JsonPath.read(planResponse, "$.id");
 
-        String subscriptonJson= """
-                {
-                    "customerEmail": "integration@test.com",
-                    "planId": "%s"
-                }
-                """.formatted(planId);
+        String subscriptionJson = """
+        {
+            "customerEmail": "%s",
+            "planId": "%s"
+        }
+        """.formatted(email, planId);
 
         mockMvc.perform(post("/subscriptions")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(subscriptonJson))
+                        .content(subscriptionJson))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.customerEmail").value("integration@test.com"))
+                .andExpect(jsonPath("$.customerEmail").value(email))
                 .andExpect(jsonPath("$.plan.id").value(planId))
                 .andExpect(jsonPath("$.plan.name").value("Premium"));
 
@@ -139,7 +143,7 @@ public class SubscriptionIntegrationTest {
                 .param("email", "integration")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].customerEmail").value(hasItem("integration@test.com")));
+                .andExpect(jsonPath("$[*].customerEmail").value(hasItem(email)));
     }
 
     @Test
